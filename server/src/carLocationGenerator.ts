@@ -4,6 +4,10 @@ import {
   getGreatCircleBearing,
   isPointInPolygon,
 } from "geolib";
+import { PubSub } from "graphql-subscriptions";
+
+export const pubsub = new PubSub();
+export const TRIGGER_NAME = 'LOCATION_UPDATED';
 
 const UPDATE_INTERVAL_MS = 1000;
 const CAR_SPEED_METERSPERMS = 8 / 1000.;
@@ -48,9 +52,12 @@ function startPublishingLocationUpdates() {
       }
     });
 
+     
     // At this point the locations of the cars have been updated.
     // It would make sense to broadcast this update somehow.
     // See https://www.apollographql.com/docs/apollo-server/data/subscriptions/#the-pubsub-class
+    
+    pubsub.publish(TRIGGER_NAME, { carsUpdated: cars });
   }, UPDATE_INTERVAL_MS);
 }
 
